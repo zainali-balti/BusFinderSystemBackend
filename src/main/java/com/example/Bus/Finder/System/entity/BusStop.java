@@ -12,7 +12,7 @@ public class BusStop{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long stopId;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String name;
     public BusStopDto getAll(){
         BusStopDto busStopDto = new BusStopDto();
