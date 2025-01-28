@@ -4,6 +4,7 @@ import com.example.Bus.Finder.System.enums.Status;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -19,16 +20,8 @@ public class BusBooking {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "bus_id", nullable = false)
-    private Bus bus;
-
-    @ManyToOne
-    @JoinColumn(name = "source_stop_id", nullable = false)
-    private BusStop sourceStop;
-
-    @ManyToOne
-    @JoinColumn(name = "destination_stop_id", nullable = false)
-    private BusStop destinationStop;
+    @JoinColumn(name = "fare_id", nullable = false)
+    private Fare fare;
 
     @Column(nullable = false)
     private LocalDateTime bookingTime = LocalDateTime.now();
@@ -36,4 +29,6 @@ public class BusBooking {
     @Enumerated(EnumType.STRING)
     private Status status = Status.PENDING;
 
+    @Column(nullable = false)
+    private BigDecimal totalFare;
 }

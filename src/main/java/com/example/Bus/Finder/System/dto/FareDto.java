@@ -10,5 +10,6 @@ public class FareDto {
     private Long routeId;
     private Long sourceStopId;
     private Long destinationStopId;
+    private Long busId;
     private BigDecimal fare;
 }

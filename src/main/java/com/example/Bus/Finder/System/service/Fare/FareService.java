@@ -11,4 +11,5 @@ public interface FareService {
     Fare getFareById(Long fareId);
     List<Fare> getAllFares();
     Fare createFare(FareDto fareDto);
+    List<Fare> getFaresByStops(Long sourceStopId, Long destinationStopId);
 }
