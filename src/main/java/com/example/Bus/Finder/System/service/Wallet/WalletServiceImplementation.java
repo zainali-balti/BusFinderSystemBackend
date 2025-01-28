@@ -2,6 +2,7 @@ package com.example.Bus.Finder.System.service.Wallet;
 
 import com.example.Bus.Finder.System.dto.WalletDto;
 import com.example.Bus.Finder.System.dto.WalletTransactionDto;
+import com.example.Bus.Finder.System.entity.User;
 import com.example.Bus.Finder.System.entity.Wallet;
 import com.example.Bus.Finder.System.entity.WalletTransaction;
 import com.example.Bus.Finder.System.enums.TransactionType;
@@ -26,13 +27,13 @@ public class WalletServiceImplementation implements WalletService{
     private UserRepository userRepository;
 
     public WalletDto getWalletByUserId(Long userId) {
-        Wallet wallet = walletRepository.findByUser_UserId(userId)
+        Wallet wallet = walletRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Wallet not found for user ID: " + userId));
         return toWalletDto(wallet);
     }
 
     public WalletDto addMoney(Long userId, BigDecimal amount) {
-        Wallet wallet = walletRepository.findByUser_UserId(userId)
+        Wallet wallet = walletRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Wallet not found for user ID: " + userId));
         wallet.setBalance(wallet.getBalance().add(amount));
 
@@ -48,7 +49,7 @@ public class WalletServiceImplementation implements WalletService{
     }
 
     public WalletDto deductMoney(Long userId, BigDecimal amount) {
-        Wallet wallet = walletRepository.findByUser_UserId(userId)
+        Wallet wallet = walletRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Wallet not found for user ID: " + userId));
 
         if (wallet.getBalance().compareTo(amount) < 0) {
@@ -69,7 +70,7 @@ public class WalletServiceImplementation implements WalletService{
     }
 
     public List<WalletTransactionDto> getTransactionHistory(Long userId) {
-        Wallet wallet = walletRepository.findByUser_UserId(userId)
+        Wallet wallet = walletRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Wallet not found for user ID: " + userId));
         List<WalletTransaction> transactions = transactionRepository.findByWallet_WalletId(wallet.getWalletId());
         return transactions.stream().map(this::toWalletTransactionDto).toList();
@@ -78,7 +79,7 @@ public class WalletServiceImplementation implements WalletService{
     private WalletDto toWalletDto(Wallet wallet) {
         WalletDto walletDto = new WalletDto();
         walletDto.setWalletId(wallet.getWalletId());
-        walletDto.setUser(wallet.getUser());
+        walletDto.setUserId(wallet.getUser().getId());
         walletDto.setBalance(wallet.getBalance());
         return walletDto;
     }
@@ -92,6 +93,16 @@ public class WalletServiceImplementation implements WalletService{
         transactionDto.setDescription(transaction.getDescription());
         transactionDto.setTransactionTime(transaction.getTransactionTime());
         return transactionDto;
+    }
+    public Wallet addWallet(Long userId, BigDecimal initialBalance) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found for ID: " + userId));
+
+        Wallet wallet = new Wallet();
+        wallet.setUser(user);
+        wallet.setBalance(initialBalance);
+
+        return walletRepository.save(wallet);
     }
 
 }

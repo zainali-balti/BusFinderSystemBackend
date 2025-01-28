@@ -2,6 +2,7 @@ package com.example.Bus.Finder.System.controller;
 
 import com.example.Bus.Finder.System.dto.WalletDto;
 import com.example.Bus.Finder.System.dto.WalletTransactionDto;
+import com.example.Bus.Finder.System.entity.Wallet;
 import com.example.Bus.Finder.System.service.Wallet.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,12 @@ import java.util.List;
 public class WalletController {
     @Autowired
     private WalletService walletService;
+
+    @PostMapping("/add-wallet/{userId}")
+    public ResponseEntity<Wallet> addWallet(@PathVariable Long userId, @RequestBody BigDecimal initialBalance) {
+        Wallet wallet = walletService.addWallet(userId, initialBalance);
+        return ResponseEntity.ok(wallet);
+    }
 
     @GetMapping("/{userId}")
     public ResponseEntity<WalletDto> getWallet(@PathVariable Long userId) {

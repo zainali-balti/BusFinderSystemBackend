@@ -11,6 +11,6 @@ import java.math.BigDecimal;
 @Data
 public class WalletDto {
     private Long walletId;
-    private User user;
+    private Long userId;
     private BigDecimal balance = BigDecimal.ZERO;
 }

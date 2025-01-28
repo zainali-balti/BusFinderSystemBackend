@@ -45,7 +45,7 @@ public class BusBookingServiceImplementation implements BusBookingService{
             throw new RuntimeException("Bus is fully booked");
         }
 
-        Wallet wallet = walletRepository.findByUser_UserId(user.getId())
+        Wallet wallet = walletRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new RuntimeException("Wallet not found for user ID: " + user.getId()));
 
         if (wallet.getBalance().compareTo(fare.getFare()) < 0) {
@@ -117,7 +117,7 @@ public class BusBookingServiceImplementation implements BusBookingService{
         bus.setCapacity(bus.getCapacity() + 1);
         busRepository.save(bus);
 
-        Wallet wallet = walletRepository.findByUser_UserId(existingBooking.getUser().getId())
+        Wallet wallet = walletRepository.findByUserId(existingBooking.getUser().getId())
                 .orElseThrow(() -> new RuntimeException("Wallet not found for user ID: " +
                         existingBooking.getUser().getId()));
 
