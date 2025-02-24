@@ -18,9 +18,7 @@ public class BusStopImplementation implements BusStopService{
     @Autowired
     private BusRepository busRepository;
 
-    public BusStop addBusStops(Long busId, BusStopDto busStopDto){
-        Bus existingBus = busRepository.findById(busId)
-                .orElseThrow(() -> new RuntimeException("Bus not found"));
+    public BusStop addBusStops(BusStopDto busStopDto){
         BusStop busStop = new BusStop();
         busStop.setName(busStopDto.getName());
         return  busStopRepository.save(busStop);

@@ -2,13 +2,16 @@ package com.example.Bus.Finder.System.service.Wallet;
 
 import com.example.Bus.Finder.System.dto.WalletDto;
 import com.example.Bus.Finder.System.dto.WalletTransactionDto;
+import com.example.Bus.Finder.System.entity.BusBooking;
 import com.example.Bus.Finder.System.entity.User;
 import com.example.Bus.Finder.System.entity.Wallet;
 import com.example.Bus.Finder.System.entity.WalletTransaction;
 import com.example.Bus.Finder.System.enums.TransactionType;
+import com.example.Bus.Finder.System.repository.BusBookingRepository;
 import com.example.Bus.Finder.System.repository.UserRepository;
 import com.example.Bus.Finder.System.repository.WalletRepository;
 import com.example.Bus.Finder.System.repository.WalletTransactionRepository;
+import com.example.Bus.Finder.System.service.BusBooking.BusBookingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +28,8 @@ public class WalletServiceImplementation implements WalletService{
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private BusBookingService busBookingService;
 
     public WalletDto getWalletByUserId(Long userId) {
         Wallet wallet = walletRepository.findByUserId(userId)
@@ -103,6 +108,12 @@ public class WalletServiceImplementation implements WalletService{
         wallet.setBalance(initialBalance);
 
         return walletRepository.save(wallet);
+    }
+    public void deleteTransaction(Long transactionId) {
+        // Find the transaction by its ID
+        WalletTransaction transaction = transactionRepository.findById(transactionId)
+                .orElseThrow(() -> new RuntimeException("Transaction not found with ID: " + transactionId));
+        transactionRepository.delete(transaction);
     }
 
 }

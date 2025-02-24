@@ -11,4 +11,5 @@ public interface BusBookingService {
     BusBooking updateBusBooking(Long bookingId, BusBookingDto busBookingDto);
     BusBooking getBusBookingById(Long bookingId);
     List<BusBooking> getAllBusBookings();
+    List<BusBookingDto> getBookingsByUserId(Long userId);
 }

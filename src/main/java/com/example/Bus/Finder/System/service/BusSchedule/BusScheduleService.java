@@ -6,9 +6,10 @@ import com.example.Bus.Finder.System.entity.BusSchedule;
 import java.util.List;
 
 public interface BusScheduleService {
-    BusSchedule createBusSchedule(Long busId, Long busStopId, Long routeId, BusScheduleDto busScheduleDto);
+    BusSchedule createBusSchedule(BusScheduleDto busScheduleDto);
     BusSchedule getBusScheduleById(Long id);
     List<BusSchedule> getAllBusSchedules();
     void deleteBusSchedule(Long id);
-    BusSchedule updateBusSchedule(Long scheduleId,Long busId, Long busStopId, Long routeId, BusScheduleDto busScheduleDto);
+    BusSchedule updateBusSchedule(Long scheduleId,BusScheduleDto busScheduleDto);
+
 }

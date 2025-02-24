@@ -1,14 +1,14 @@
 package com.example.Bus.Finder.System.service.Fare;
 
+import com.example.Bus.Finder.System.dto.BusScheduleDto;
 import com.example.Bus.Finder.System.dto.FareDto;
 import com.example.Bus.Finder.System.entity.*;
 import com.example.Bus.Finder.System.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class FareServiceImplementation implements FareService{
@@ -16,27 +16,23 @@ public class FareServiceImplementation implements FareService{
     private FareRepository fareRepository;
 
     @Autowired
-    private RouteRepository routeRepository;
+    private BusRouteRepository routeRepository;
 
     @Autowired
     private BusStopRepository busStopRepository;
     @Autowired
     private BusRepository busRepository;
+    @Autowired
+    private BusScheduleRepository busScheduleRepository;
 
     public Fare createFare(FareDto fareDto) {
-        Route route = routeRepository.findById(fareDto.getRouteId())
+        BusRoute route = routeRepository.findById(fareDto.getBusRouteId())
                 .orElseThrow(() -> new RuntimeException("Route not found"));
-        BusStop sourceStop = busStopRepository.findById(fareDto.getSourceStopId())
-                .orElseThrow(() -> new RuntimeException("Source stop not found"));
-        BusStop destinationStop = busStopRepository.findById(fareDto.getDestinationStopId())
-                .orElseThrow(() -> new RuntimeException("Destination stop not found"));
         Bus bus = busRepository.findById(fareDto.getBusId())
                 .orElseThrow(() -> new RuntimeException("Bus  not found"));
 
         Fare fare = new Fare();
-        fare.setRoute(route);
-        fare.setSourceStop(sourceStop);
-        fare.setDestinationStop(destinationStop);
+        fare.setBusRoute(route);
         fare.setBus(bus);
         fare.setFare(fareDto.getFare());
 
@@ -56,22 +52,10 @@ public class FareServiceImplementation implements FareService{
         Fare existingFare = fareRepository.findById(fareId)
                 .orElseThrow(() -> new RuntimeException("Fare not found"));
 
-        if (fareDto.getRouteId() != null) {
-            Route updatedRoute = routeRepository.findById(fareDto.getRouteId())
+        if (fareDto.getBusRouteId() != null) {
+            BusRoute updatedRoute = routeRepository.findById(fareDto.getBusRouteId())
                     .orElseThrow(() -> new RuntimeException("Route not found"));
-            existingFare.setRoute(updatedRoute);
-        }
-
-        if (fareDto.getSourceStopId() != null) {
-            BusStop updatedSourceStop = busStopRepository.findById(fareDto.getSourceStopId())
-                    .orElseThrow(() -> new RuntimeException("Source stop not found"));
-            existingFare.setSourceStop(updatedSourceStop);
-        }
-
-        if (fareDto.getDestinationStopId() != null) {
-            BusStop updatedDestinationStop = busStopRepository.findById(fareDto.getDestinationStopId())
-                    .orElseThrow(() -> new RuntimeException("Destination stop not found"));
-            existingFare.setDestinationStop(updatedDestinationStop);
+            existingFare.setBusRoute(updatedRoute);
         }
         if (fareDto.getBusId() != null) {
             Bus bus = busRepository.findById(fareDto.getBusId())
@@ -91,12 +75,57 @@ public class FareServiceImplementation implements FareService{
                 .orElseThrow(() -> new RuntimeException("Fare not found"));
         fareRepository.delete(fare);
     }
-    public List<Fare> getFaresByStops(Long sourceStopId, Long destinationStopId) {
-        BusStop sourceStop = busStopRepository.findById(sourceStopId)
-                .orElseThrow(() -> new RuntimeException("Source stop not found"));
-        BusStop destinationStop = busStopRepository.findById(destinationStopId)
-                .orElseThrow(() -> new RuntimeException("Destination stop not found"));
 
-        return fareRepository.findBySourceStopAndDestinationStop(sourceStop, destinationStop);
+    public List<FareDto> getFareByBusId(Long busId) {
+        List<Fare> fares = fareRepository.findByBus_BusId(busId);
+        if (fares.isEmpty()) {
+            throw new RuntimeException("No fares found for the given busId");
+        }
+        List<FareDto> fareDtos = fares.stream()
+                .map(fare -> new FareDto(
+                        fare.getFareId(),
+                        fare.getBus().getBusId(),
+                        fare.getBusRoute().getId(),
+                        fare.getFare()
+
+                ))
+                .collect(Collectors.toList());
+
+        return fareDtos;
     }
+
+    public List<Map<String, Object>> getBusesWithFareAndSchedule(Long sourceStopId, Long destinationStopId) {
+            List<Fare> fares = fareRepository.findBusesBySourceAndDestination(sourceStopId, destinationStopId);
+            List<Map<String, Object>> responseList = new ArrayList<>();
+
+            for (Fare fare : fares) {
+                Bus bus = fare.getBus();
+                Optional<BusSchedule> scheduleOpt = busScheduleRepository.findByBus_BusIdAndRoute_Id(
+                        bus.getBusId(), fare.getBusRoute().getId());
+
+                Map<String, Object> busData = new HashMap<>();
+                busData.put("busId", bus.getBusId());
+                busData.put("busName", bus.getBusName());
+                busData.put("busNumber", bus.getBusNumber());
+                busData.put("capacity", bus.getCapacity());
+                busData.put("img",bus.getImg());
+                busData.put("status",bus.getStatus());
+                busData.put("fare", fare.getFare());
+                busData.put("fareId",fare.getFareId());
+
+                if (scheduleOpt.isPresent()) {
+                    BusSchedule schedule = scheduleOpt.get();
+                    busData.put("arrivalTime", schedule.getArrivalTime());
+                    busData.put("departureTime", schedule.getDepartureTime());
+                } else {
+                    busData.put("arrivalTime", "Not Available");
+                    busData.put("departureTime", "Not Available");
+                }
+
+                responseList.add(busData);
+            }
+
+            return responseList;
+        }
+
 }

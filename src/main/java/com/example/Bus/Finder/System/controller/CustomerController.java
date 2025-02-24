@@ -1,5 +1,6 @@
 package com.example.Bus.Finder.System.controller;
 
+import com.example.Bus.Finder.System.dto.UserDto;
 import com.example.Bus.Finder.System.dto.VehicleDto;
 import com.example.Bus.Finder.System.service.Customer.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,7 @@ public class CustomerController {
     @Autowired
     private CustomerService customerService;
 
-    @GetMapping("all")
+    @GetMapping("/all/vehicles")
     public ResponseEntity<?> FindAllVehicles() {
         List<VehicleDto> vehicleDtos = customerService.FindAllVehicles();
         if (!vehicleDtos.isEmpty()) {
@@ -33,5 +34,10 @@ public class CustomerController {
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No vehicles found for the user.");
         }
+    }
+    @GetMapping("/{userId}")
+    public ResponseEntity<UserDto> getVehicleById(@PathVariable Long userId) {
+        UserDto userDto = customerService.findUserById(userId);
+        return ResponseEntity.ok(userDto);
     }
 }

@@ -26,20 +26,14 @@ public class Bus {
     @Column(nullable = false)
     private int capacity;
 
+    @Lob
+    @Column(columnDefinition = "longblob")
+    private byte[] img;
+
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Status status;
-
-    public BusDto getAll(){
-        BusDto busDto = new BusDto();
-        busDto.setBusId(busId);
-        busDto.setBusNumber(busNumber);
-        busDto.setBusName(busName);
-        busDto.setCapacity(capacity);
-        busDto.setStatus(status);
-        return busDto;
-    }
-
-
-
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 }

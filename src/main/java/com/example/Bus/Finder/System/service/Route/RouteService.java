@@ -2,14 +2,13 @@ package com.example.Bus.Finder.System.service.Route;
 
 
 import com.example.Bus.Finder.System.dto.RouteDto;
-import com.example.Bus.Finder.System.entity.Route;
 
 import java.util.List;
 
 public interface RouteService {
-    Route addRouteBus(Long busId, Long busStopId, RouteDto routeDto);
-    Route getRouteById(Long routeId);
+    RouteDto addRoute(RouteDto routeDto);
+    RouteDto updateRoute(Long id, RouteDto routeDto);
     List<RouteDto> getAllRoutes();
-    void deleteRoute(Long routeId);
-    Route updateRoute(Long routeId, RouteDto routeDto, Long busId, Long busStopId);
+    RouteDto getRouteById(Long id);
+    void deleteRoute(Long id);
 }

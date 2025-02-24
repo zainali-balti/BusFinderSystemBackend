@@ -16,7 +16,7 @@ public class Booking {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")
     private User user;
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "vehicle_id")
     private Vehicle vehicles;
     private LocalDateTime bookingDate;
@@ -24,8 +24,8 @@ public class Booking {
     private Double totalPrice;
     private Double distance;
 
-    public BookingDto getAllBooking(){
-        BookingDto bookingDto =new BookingDto();
+    public BookingDto getAllBooking() {
+        BookingDto bookingDto = new BookingDto();
         bookingDto.setId(id);
         bookingDto.setBookingDate(bookingDate);
         bookingDto.setDistance(distance);
@@ -35,6 +35,5 @@ public class Booking {
         bookingDto.setTotalPrice(totalPrice);
         return bookingDto;
     }
-
 
 }

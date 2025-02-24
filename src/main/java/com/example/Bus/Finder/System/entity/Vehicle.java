@@ -6,6 +6,8 @@ import lombok.Data;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.Base64;
+
 @Data
 @Entity
 @Table(name = "vehicle")
@@ -28,21 +30,29 @@ public class Vehicle {
     @JoinColumn(name = "user_id")
     @OnDelete(action= OnDeleteAction.CASCADE)
     private User user;
+    @Column(nullable = false)
+    private boolean isBooked = false;
 
     public VehicleDto getAddVehicleDto(){
-        VehicleDto addVehicleDto = new VehicleDto();
-        addVehicleDto.setId(id);
-        addVehicleDto.setColor(color);
-        addVehicleDto.setVehicleName(vehicleName);
-        addVehicleDto.setReturnedImg(img);
-        addVehicleDto.setDistance(distance);
-        addVehicleDto.setPrice(price);
-        addVehicleDto.setDescription(description);
-        addVehicleDto.setEngineNo(engineNo);
-        addVehicleDto.setOwnerId(user.getId());
-        addVehicleDto.setOwnerName(user.getFirstName());
-        addVehicleDto.setTotalSeats(totalSeats);
-        addVehicleDto.setModelNo(modelNo);
-        return addVehicleDto;
+    VehicleDto addVehicleDto = new VehicleDto();
+    addVehicleDto.setId(id);
+    addVehicleDto.setColor(color);
+    addVehicleDto.setVehicleName(vehicleName);
+    if (img != null) {
+        String base64Image = Base64.getEncoder().encodeToString(img);
+        addVehicleDto.setReturnedImg(base64Image);
     }
+    addVehicleDto.setDistance(distance);
+    addVehicleDto.setPrice(price);
+    addVehicleDto.setDescription(description);
+    addVehicleDto.setEngineNo(engineNo);
+    addVehicleDto.setOwnerId(user.getId());
+    addVehicleDto.setOwnerName(user.getFirstName());
+    addVehicleDto.setTotalSeats(totalSeats);
+    addVehicleDto.setModelNo(modelNo);
+    addVehicleDto.setBooked(isBooked);
+    return addVehicleDto;
 }
+}
+
+

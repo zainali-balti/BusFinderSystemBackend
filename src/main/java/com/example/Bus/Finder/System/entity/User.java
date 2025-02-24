@@ -20,6 +20,7 @@ public class User {
     private String firstName;
     private String lastName;
     private String phoneNo;
+    @Enumerated(EnumType.STRING)
     private UserRole role;
 
     public UserDto getDto() {

@@ -3,11 +3,15 @@ package com.example.Bus.Finder.System.controller;
 import com.example.Bus.Finder.System.dto.BusScheduleDto;
 import com.example.Bus.Finder.System.entity.BusSchedule;
 import com.example.Bus.Finder.System.service.BusSchedule.BusScheduleService;
+import com.example.Bus.Finder.System.wrapper.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/schedule")
@@ -15,16 +19,30 @@ public class BusScheduleController {
     @Autowired
     private BusScheduleService busScheduleService;
 
-    @PostMapping("/add/{busId}/{busStopId}/{routeId}")
-    public ResponseEntity<String> createBusSchedule(
-            @PathVariable Long busId,
-            @PathVariable Long busStopId,
-            @PathVariable Long routeId,
-            @RequestBody BusScheduleDto busScheduleDto){
+    @PostMapping("/add")
+    public ResponseEntity<Map<String, Object>> createBusSchedule(
+            @RequestBody BusScheduleDto busScheduleDto) {
 
-        BusSchedule busSchedule = busScheduleService.createBusSchedule(busId,busStopId,routeId,busScheduleDto);
-        return ResponseEntity.ok("Bus Schedule Created Successfully "+busSchedule);
+        try {
+            BusSchedule busSchedule = busScheduleService.createBusSchedule(busScheduleDto);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Bus Schedule Created Successfully");
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("busSchedule", busSchedule);
+            data.put("routeId", busSchedule.getRoute().getId());
+
+            response.put("data", data);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("message", "Error creating bus schedule: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
     }
+
 
     // Get all Bus Schedules
     @GetMapping("/all")
@@ -41,14 +59,11 @@ public class BusScheduleController {
     }
 
     // Update Bus Schedule
-    @PutMapping("/update/{scheduleId}/{busId}/{busStopId}/{routeId}")
+    @PutMapping("/update/{scheduleId}")
     public ResponseEntity<BusSchedule> updateBusSchedule(
             @PathVariable Long scheduleId,
-            @PathVariable Long busId,
-            @PathVariable Long busStopId,
-            @PathVariable Long routeId,
             @RequestBody BusScheduleDto busScheduleDto) {
-        BusSchedule updatedBusSchedule = busScheduleService.updateBusSchedule(scheduleId,busId,busStopId,routeId,busScheduleDto);
+        BusSchedule updatedBusSchedule = busScheduleService.updateBusSchedule(scheduleId,busScheduleDto);
         return ResponseEntity.ok(updatedBusSchedule);
     }
 

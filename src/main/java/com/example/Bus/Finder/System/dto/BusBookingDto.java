@@ -10,6 +10,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Data
 public class BusBookingDto {
@@ -19,5 +20,4 @@ public class BusBookingDto {
     private LocalDateTime bookingTime = LocalDateTime.now();
     private Status status = Status.CONFIRMED;
     private BigDecimal totalFare;
-
 }

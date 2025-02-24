@@ -51,4 +51,9 @@ public class BusBookingController {
         busBookingService.deleteBusBooking(id);
         return ResponseEntity.noContent().build();
     }
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<BusBookingDto>> getBookingsByUserId(@PathVariable Long userId) {
+        List<BusBookingDto> bookings = busBookingService.getBookingsByUserId(userId);
+        return ResponseEntity.ok(bookings);
+    }
 }

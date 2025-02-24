@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class BusBookingServiceImplementation implements BusBookingService{
@@ -133,6 +134,23 @@ public class BusBookingServiceImplementation implements BusBookingService{
         walletTransactionRepository.save(transaction);
 
         busBookingRepository.delete(existingBooking);
+    }
+    public List<BusBookingDto> getBookingsByUserId(Long userId) {
+        List<BusBooking> bookings = busBookingRepository.findByUserId(userId);
+        return bookings.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    private BusBookingDto convertToDto(BusBooking booking) {
+        BusBookingDto dto = new BusBookingDto();
+        dto.setBookingId(booking.getBookingId());
+        dto.setUserId(booking.getUser().getId());
+        dto.setFareId(booking.getFare().getFareId());
+        dto.setBookingTime(booking.getBookingTime());
+        dto.setStatus(booking.getStatus());
+        dto.setTotalFare(booking.getTotalFare());
+        return dto;
     }
 
 }

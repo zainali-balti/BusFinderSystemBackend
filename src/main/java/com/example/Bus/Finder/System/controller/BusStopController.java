@@ -3,22 +3,29 @@ package com.example.Bus.Finder.System.controller;
 import com.example.Bus.Finder.System.dto.BusStopDto;
 import com.example.Bus.Finder.System.entity.BusStop;
 import com.example.Bus.Finder.System.service.BusStop.BusStopService;
+import com.example.Bus.Finder.System.wrapper.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/api/stop")
 public class BusStopController {
     @Autowired
     private BusStopService busStopService;
 
-    @PostMapping("/add/{busId}")
-    public ResponseEntity<?> createBusStops(@PathVariable Long busId, @RequestBody BusStopDto busStopDto){
-        BusStop busStop = busStopService.addBusStops(busId,busStopDto);
-        return ResponseEntity.ok("BusStop Created Successfully "+busStop);
+    @PostMapping("/add")
+    public ResponseEntity<?> createBusStops(@RequestBody BusStopDto busStopDto) {
+        try {
+            BusStop busStop = busStopService.addBusStops(busStopDto);
+            return ResponseEntity.ok(new ApiResponse("BusStop Created Successfully", busStop));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse("Failed to add BusStop", null));
+        }
     }
     @PutMapping("/update/{busStopId}")
     public ResponseEntity<BusStop> updateBusStop(@PathVariable Long busStopId, @RequestBody BusStopDto busStopDto) {

@@ -15,7 +15,8 @@ public class VehicleDto {
     private Double price;
     private Double distance;
     private MultipartFile img;
-    private byte[] returnedImg;
+    private String returnedImg;
     private Long ownerId;
     private String ownerName;
+    private boolean isBooked;
 }

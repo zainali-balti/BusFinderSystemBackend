@@ -13,4 +13,5 @@ public interface WalletService {
     WalletDto addMoney(Long userId, BigDecimal amount);
     WalletDto getWalletByUserId(Long userId);
     Wallet addWallet(Long userId, BigDecimal initialBalance);
+    void deleteTransaction(Long transactionId);
 }

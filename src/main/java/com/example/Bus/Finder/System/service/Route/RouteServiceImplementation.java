@@ -1,65 +1,72 @@
 package com.example.Bus.Finder.System.service.Route;
 
 import com.example.Bus.Finder.System.dto.RouteDto;
-import com.example.Bus.Finder.System.entity.Bus;
-import com.example.Bus.Finder.System.entity.BusStop;
 import com.example.Bus.Finder.System.entity.Route;
-import com.example.Bus.Finder.System.repository.BusRepository;
-import com.example.Bus.Finder.System.repository.BusStopRepository;
 import com.example.Bus.Finder.System.repository.RouteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class RouteServiceImplementation implements RouteService{
-    @Autowired
-    private BusRepository busRepository;
+
+
     @Autowired
     private RouteRepository routeRepository;
-    @Autowired
-    private BusStopRepository busStopRepository;
 
-    public Route addRouteBus(Long busId,Long busStopId, RouteDto routeDto){
-        Bus bus = busRepository.findById(busId)
-                .orElseThrow(() -> new RuntimeException("Bus not found"));
-        BusStop busStop = busStopRepository.findById(busStopId)
-                .orElseThrow(() -> new RuntimeException("Bus Stop not found"));
+    // ✅ Add a new route
+    @Override
+    public RouteDto addRoute(RouteDto routeDto) {
         Route route = new Route();
-        route.setBus(bus);
-        route.setStop(busStop);
-        route.setStopSequence(routeDto.getStopSequence());
-        return  routeRepository.save(route);
+        route.setName(routeDto.getRouteName());
+
+        Route savedRoute = routeRepository.save(route);
+        return mapToDto(savedRoute);
     }
-    public Route updateRoute(Long routeId, RouteDto routeDto, Long busId, Long busStopId) {
-        Route existingRoute = routeRepository.findById(routeId)
-                .orElseThrow(() -> new RuntimeException("Route not found"));
 
-        Bus bus = busRepository.findById(busId)
-                .orElseThrow(() -> new RuntimeException("Bus not found"));
+    // ✅ Update an existing route
+    @Override
+    public RouteDto updateRoute(Long id, RouteDto routeDto) {
+        Route route = routeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Route not found with ID: " + id));
 
-        BusStop busStop = busStopRepository.findById(busStopId)
-                .orElseThrow(() -> new RuntimeException("Bus Stop not found"));
-
-        existingRoute.setBus(bus);
-        existingRoute.setStop(busStop);
-        existingRoute.setStopSequence(routeDto.getStopSequence());
-
-        return routeRepository.save(existingRoute);
+        route.setName(routeDto.getRouteName());
+        Route updatedRoute = routeRepository.save(route);
+        return mapToDto(updatedRoute);
     }
-    public void deleteRoute(Long routeId) {
-        Route route = routeRepository.findById(routeId)
-                .orElseThrow(() -> new RuntimeException("Route not found"));
-        routeRepository.delete(route);
-    }
+
+    // ✅ Get all routes
+    @Override
     public List<RouteDto> getAllRoutes() {
         List<Route> routes = routeRepository.findAll();
-        return routes.stream().map(Route::getAllRoute).toList();
-    }
-    public Route getRouteById(Long routeId) {
-        return routeRepository.findById(routeId)
-                .orElseThrow(() -> new RuntimeException("Route not found"));
+        return routes.stream()
+                .map(this::mapToDto)  // Use helper method
+                .collect(Collectors.toList());
     }
 
+    // ✅ Get route by ID
+    @Override
+    public RouteDto getRouteById(Long id) {
+        Route route = routeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Route not found with ID: " + id));
+        return mapToDto(route);
+    }
+
+    // ✅ Delete route by ID
+    @Override
+    public void deleteRoute(Long id) {
+        if (!routeRepository.existsById(id)) {
+            throw new RuntimeException("Route not found with ID: " + id);
+        }
+        routeRepository.deleteById(id);
+    }
+
+    private RouteDto mapToDto(Route route) {
+        RouteDto dto = new RouteDto();
+        dto.setRouteId(route.getId());
+        dto.setRouteName(route.getName());
+        return dto;
+    }
 }

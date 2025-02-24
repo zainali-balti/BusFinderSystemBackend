@@ -7,10 +7,12 @@ import com.example.Bus.Finder.System.repository.VehicleRepository;
 import com.example.Bus.Finder.System.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class VehicleServiceImplementation implements VehicleService {
@@ -53,13 +55,13 @@ public class VehicleServiceImplementation implements VehicleService {
                 .map(Vehicle::getAddVehicleDto)
                 .toList();
     }
-    public List<VehicleDto> FindAllVehicles(){
-        List<Vehicle> vehicles = vehicleRepository.findAll();
-        return vehicles.stream()
-                .map(Vehicle::getAddVehicleDto)
-                .toList();
-    }
-    public boolean updateVehicle(Long vehicleId, Long userId, VehicleDto updatedVehicleDto) {
+public List<VehicleDto> FindAllVehicles() {
+    List<Vehicle> vehicles = vehicleRepository.findAll();
+    return vehicles.stream()
+            .map(Vehicle::getAddVehicleDto)
+            .collect(Collectors.toList());
+}
+    public boolean updateVehicle(Long vehicleId, Long userId, VehicleDto updatedVehicleDto, MultipartFile img) {
         Optional<Vehicle> optionalVehicle = vehicleRepository.findById(vehicleId);
         if (optionalVehicle.isPresent()) {
             Vehicle existingVehicle = optionalVehicle.get();
@@ -74,9 +76,9 @@ public class VehicleServiceImplementation implements VehicleService {
                 existingVehicle.setTotalSeats(updatedVehicleDto.getTotalSeats());
 
                 // Handle image conversion if a new image is provided
-                if (updatedVehicleDto.getImg() != null && !updatedVehicleDto.getImg().isEmpty()) {
+                if (img != null && !img.isEmpty()) {
                     try {
-                        byte[] imageBytes = updatedVehicleDto.getImg().getBytes();
+                        byte[] imageBytes = img.getBytes();
                         existingVehicle.setImg(imageBytes);
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -88,6 +90,7 @@ public class VehicleServiceImplementation implements VehicleService {
         }
         return false;
     }
+
     public boolean deleteVehicle(Long vehicleId, Long userId) {
         Optional<Vehicle> optionalVehicle = vehicleRepository.findById(vehicleId);
         if (optionalVehicle.isPresent()) {
@@ -99,6 +102,15 @@ public class VehicleServiceImplementation implements VehicleService {
         }
         return false;
     }
+
+    public VehicleDto findVehicleById(Long vehicleId) {
+        return vehicleRepository.findById(vehicleId)
+                .map(Vehicle::getAddVehicleDto) // Convert to DTO if present
+                .orElseThrow(() -> new RuntimeException("Vehicle not found with ID: " + vehicleId));
+    }
+
+
+
 
 
 }

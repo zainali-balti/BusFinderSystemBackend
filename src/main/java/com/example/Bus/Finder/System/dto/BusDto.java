@@ -2,6 +2,7 @@ package com.example.Bus.Finder.System.dto;
 
 import com.example.Bus.Finder.System.enums.Status;
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 public class BusDto {
@@ -9,5 +10,7 @@ public class BusDto {
     private String busName;
     private String busNumber;
     private int capacity;
-    private Status status = Status.ACTIVE;
+    private byte[] img;
+    private Long userId;
+    private Status status;
 }

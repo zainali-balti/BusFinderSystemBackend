@@ -14,16 +14,8 @@ public class Fare {
     private Long fareId;
 
     @ManyToOne
-    @JoinColumn(name = "route_id", nullable = false)
-    private Route route;
-
-    @ManyToOne
-    @JoinColumn(name = "source_stop_id", nullable = false)
-    private BusStop sourceStop;
-
-    @ManyToOne
-    @JoinColumn(name = "destination_stop_id", nullable = false)
-    private BusStop destinationStop;
+    @JoinColumn(name = "bus_route_id", nullable = false)
+    private BusRoute busRoute;
 
     @ManyToOne
     @JoinColumn(name = "bus_id", nullable = false)

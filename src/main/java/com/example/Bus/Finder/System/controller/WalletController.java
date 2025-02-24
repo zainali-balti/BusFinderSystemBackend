@@ -50,4 +50,10 @@ public class WalletController {
         List<WalletTransactionDto> transactions = walletService.getTransactionHistory(userId);
         return ResponseEntity.ok(transactions);
     }
+    @DeleteMapping("/transactions/{transactionId}")
+    public ResponseEntity<String> deleteTransaction(@PathVariable Long transactionId) {
+        walletService.deleteTransaction(transactionId);
+        return ResponseEntity.ok("Transaction deleted successfully");
+    }
+
 }
